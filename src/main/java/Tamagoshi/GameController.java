@@ -19,6 +19,11 @@ import Tamagoshi.tamagoshis.*;
 
 public class GameController implements Initializable {
 
+    public static boolean avoirManger;
+    public static boolean avoirJouer;
+    public int cycle;
+
+    public List<TamaController> tamaControllers;
     public TextArea console;
     private List<Tamagoshi> allTamagoshis;
     private List<Tamagoshi> aliveTamagoshis;
@@ -29,20 +34,55 @@ public class GameController implements Initializable {
         return names[randomIndex];
     }
 
-    public void play() {
-        int cycle = 1;
-        while (! aliveTamagoshis.isEmpty()) {
-            console.setText(console.getText()+ "\n" + "-------------" + (cycle++) + "-------------");
-            for (Tamagoshi t : aliveTamagoshis)
-                console.setText(console.getText()+ "\n" +"QuelTamagoshiNourrir ?");
-            for (Iterator<Tamagoshi> iterator = aliveTamagoshis.iterator(); iterator.hasNext();) {
+    public void verifTour() {
+        if ((avoirJouer == true)  &&  (avoirManger == true)) {
+            for (Iterator<Tamagoshi> iterator = aliveTamagoshis.iterator(); iterator.hasNext(); ) {
                 Tamagoshi t = iterator.next();
                 if (!t.consommeEnergy() || !t.consommeFun() || t.vieillit())
                     iterator.remove();
             }
+
+            reactiverBTN();
+            MAJ();
+            VerifGame();
         }
-        console.setText(console.getText()+ "\n" +"\n\t--------- fin de partie !! ----------------\n\n");
-        resultat();
+    }
+    public void VerifGame() {
+
+        if (! aliveTamagoshis.isEmpty()) {
+            console.setText(console.getText()+ "\n" + "-------------" + (cycle+=1) + "-------------");
+                console.setText(console.getText()+ "\n" +"QuelTamagoshiNourrir et avec qui jouer ?");
+        }
+        else {
+            console.setText(console.getText() + "\n" + "\n\t--------- fin de partie !! ----------------\n\n");
+            resultat();
+        }
+    }
+
+    public void desactiverBTNJouer(){
+        for (TamaController controller: tamaControllers) {
+            controller.desactiverBTNJouer();
+        }
+        avoirJouer = true;
+    }
+
+    public void desactiverBTNManger(){
+        for (TamaController controller: tamaControllers) {
+            controller.desactiverBTNManger();
+        }
+        avoirManger = true;
+    }
+
+    public void reactiverBTN(){
+        for (TamaController controller: tamaControllers) {
+            controller.reactiverBTN();
+        }
+    }
+
+    public void MAJ() {
+        for (TamaController controller: tamaControllers) {
+            controller.commentCaVa();
+        }
     }
 
     private double score() {
@@ -55,7 +95,7 @@ public class GameController implements Initializable {
     private void initialiser(Integer i){
         String name = getRandomName();
         Random random = new Random();
-        switch (random.nextInt(4)) {
+        switch (random.nextInt(5)) {
             case 0:
                 allTamagoshis.add(new GrosMangeur(name));
                 break;
@@ -68,13 +108,17 @@ public class GameController implements Initializable {
             case 3:
                 allTamagoshis.add(new Fou(name));
                 break;
+            case 4:
+                allTamagoshis.add(new Joyeux(name));
+                break;
             default:
                 allTamagoshis.add(new Tamagoshi(name));
                 break;
         }
-        TamaController controller = new TamaController(allTamagoshis.get(i));
+        TamaController tamaController = new TamaController(allTamagoshis.get(i),this);
         FXMLLoader fxmlLoader = new FXMLLoader();
         fxmlLoader.setLocation(TamaGameGraphic.class.getResource("TamagoshiGameMenu.fxml"));
+        fxmlLoader.setController(tamaController);
         Stage stage = new Stage();
         stage.setTitle(name);
         stage.setX(i * 550);
@@ -85,7 +129,8 @@ public class GameController implements Initializable {
             throw new RuntimeException(e);
         }
         stage.show();
-        controller.setName(name);
+        tamaControllers.add(tamaController);
+        tamaController.setName(name);
     }
 
     private void resultat() {
@@ -98,10 +143,9 @@ public class GameController implements Initializable {
         }
         console.setText(console.getText()+ "\n" +"\nniveau de difficulté : " + allTamagoshis.size() + ", score obtenu : " + score() + "%");
     }
-
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        tamaControllers = new ArrayList<TamaController>();
         allTamagoshis = new ArrayList<Tamagoshi>();
         aliveTamagoshis = new ArrayList<Tamagoshi>();
         TextInputDialog textInput = new TextInputDialog();
@@ -117,7 +161,10 @@ public class GameController implements Initializable {
             }
         }
         aliveTamagoshis = new ArrayList<Tamagoshi>(allTamagoshis);
-        play();
+        avoirManger=false;
+        avoirJouer=false;
+        console.setText(console.getText()+ "\n" + "-------------" + (cycle+=1) + "-------------");
+        console.setText(console.getText()+ "\n" +"QuelTamagoshiNourrir et avec qui jouer ?");
     }
     public void quitter(ActionEvent actionEvent) {
         Platform.exit();

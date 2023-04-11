@@ -4,6 +4,7 @@ package Tamagoshi;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import Tamagoshi.tamagoshis.*;
 
@@ -12,41 +13,55 @@ import java.util.concurrent.CountDownLatch;
 
 public class TamaController {
     private Tamagoshi tamagoshi;
-
     @FXML
     private Label name;
-
     @FXML
     private Label etat;
+    @FXML
+    private Button btnManger;
+    @FXML
+    private Button btnJouer;
+    private GameController GameController;
 
-    private CountDownLatch latch;
-
-    public TamaController() {
-    }
-
-    public TamaController(Tamagoshi tamagoshi, String name) {
+    public TamaController(Tamagoshi tamagoshi, GameController GameController)
+    {
         this.tamagoshi = tamagoshi;
-        this.name.setText(name);
-    }
-
-    public TamaController(Tamagoshi tamagoshi) {
-        this.tamagoshi = tamagoshi;
+        this.GameController = GameController;
     }
 
     public void Manger(ActionEvent actionEvent) {
         tamagoshi.mange();
-        latch.countDown();
+        GameController.desactiverBTNManger();
+        GameController.verifTour();
     }
 
     public void Jouer(ActionEvent actionEvent) {
         tamagoshi.joue();
-        latch.countDown();
+        GameController.desactiverBTNJouer();
+        GameController.verifTour();
     }
 
-    @FXML
+    public void commentCaVa(){
+        etat.setText(tamagoshi.parle());
+    }
+
+    public void desactiverBTNManger(){
+        btnManger.setDisable(true);
+    }
+
+    public void desactiverBTNJouer(){
+        btnJouer.setDisable(true);
+    }
+
+    public void reactiverBTN(){
+        btnManger.setDisable(false);
+        btnJouer.setDisable(false);
+
+    }
+
     public void setName(String nameTama) {
         name.setText(nameTama);
-        etat.setText(this.tamagoshi.parle());
+        etat.setText(tamagoshi.parle());
 
     }
 

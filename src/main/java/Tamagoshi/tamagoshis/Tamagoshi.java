@@ -47,6 +47,9 @@ public class Tamagoshi {
 		if (s.isEmpty()) {
 			s="Tout va bien !";
 		}
+		if(!isAlive()){
+			s="Ayeuh je suis Mort!";
+		}
 		return s;
 	}
 
