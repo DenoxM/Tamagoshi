@@ -10,12 +10,24 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import Tamagoshi.tamagoshis.*;
 
+/**
+ * Classe gérant la console
+ */
 public class MenuController {
     private Stage stage;
+    /**
+     * Méthode appelée lors du click sur le boutton quitter permettant de quitter la page
+     * @param actionEvent
+     */
     public void quitter(ActionEvent actionEvent) {
         Platform.exit();
     }
 
+    /**
+     * Méthode permettant d'afficher la console
+     * @param actionEvent
+     * @throws IOException
+     */
     public void Jouer(ActionEvent actionEvent) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader();
         fxmlLoader.setLocation(TamaGameGraphic.class.getResource("TamagoshiConsole.fxml"));
